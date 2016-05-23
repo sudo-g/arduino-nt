@@ -136,9 +136,6 @@ typedef struct {
 class NtBus
 {
 public:
-	NtBus(tNTBusGetImuData* imuBuffer);
-	void writeImuData(uint8_t status);
+	void writeImuData(tNTBusGetImuData* data, uint8_t status);
 	void readFromMaster();
-private:
-	tNTBusGetImuData* imuDataRef;
 };
