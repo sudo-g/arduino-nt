@@ -4,6 +4,8 @@
 #define STORM32NTBUS_VERSION             003
 #define STORM32NTBUS_VERSIONSTR          "v0.03"
 
+#define NT_BAUD 2000000
+
 
 // NT MODULE ID LIST
 #define NTBUS_ID_ALLMODULES               0
@@ -133,9 +135,12 @@ typedef struct {
 #define NTBUS_GETIMU_DATALEN              (sizeof(tNTBusGetImuData))
 
 
-class NtBus
+class NtNode
 {
 public:
+	NtNode(uint8_t id);
 	void writeImuData(tNTBusGetImuData* data, uint8_t status);
 	void readFromMaster();
+private:
+	bool reading;
 };
