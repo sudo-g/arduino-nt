@@ -4,8 +4,8 @@
 #define STORM32NTBUS_VERSION             003
 #define STORM32NTBUS_VERSIONSTR          "v0.03"
 
-#define NT_BAUD 2000000
-
+#define NTBUS_FROM_MASTER                 (1<<7)
+#define NTBUS_BUFSIZE                     16
 
 // NT MODULE ID LIST
 #define NTBUS_ID_ALLMODULES               0
@@ -135,12 +135,67 @@ typedef struct {
 #define NTBUS_GETIMU_DATALEN              (sizeof(tNTBusGetImuData))
 
 
+/**
+ * Ring buffer used for NT bus data.
+ */
+class NtRingBuf
+{
+public:
+	// following are public for fast interrupt access.
+	uint8_t slots[NTBUS_BUFSIZE-1];
+	uint8_t wrtInd;
+	uint8_t unread;
+
+	NtRingBuf();
+
+	/**
+	 * Get the last unread byte from buffer.
+	 *
+	 * \param data Buffer to write output to.
+	 * \return True if data was read, False if no unread items.
+	 */
+	bool pop(uint8_t* data);
+};
+
+
+/**
+ * Abstract NT bus node.
+ */
 class NtNode
 {
 public:
+	enum NtState
+	{
+		IDLE, TRIGGERED, GETDATA, MOTORDATA
+	};
+
+	/**
+	 * Creates a NtNode which matches a specified ID.
+	 *
+	 * \param id NT ID which this node responds to.
+	 */
 	NtNode(uint8_t id);
+
+	/**
+	 * Handle data written to the bus.
+	 */
+	void processBusData();
+
+protected:
+	uint8_t matchIdGetData;
+	NtState busState;
+	NtRingBuf* buffer;
+};
+
+
+class NtNodeImu : public NtNode
+{
+public:
+	/**
+	 * Writes IMU state to the NT bus.
+	 *
+	 * \param data   The measurements from the IMU.
+	 * \param status The status of the IMU.
+	 */
 	void writeImuData(tNTBusGetImuData* data, uint8_t status);
-	void readFromMaster();
-private:
-	bool reading;
 };
