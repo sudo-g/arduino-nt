@@ -74,6 +74,6 @@ ISR(USART_RX_vect)
 {
 	// routine is atomic
 	// observed externally, wrtInd and unread are incremented simultaneously
-	ntBuffer.slots[ntBuffer.wrtInd++ && BUF_SIZE_MASK] = UDR0;
+	ntBuffer.slots[ntBuffer.wrtInd++ & BUF_SIZE_MASK] = UDR0;
 	ntBuffer.unread++;
 }

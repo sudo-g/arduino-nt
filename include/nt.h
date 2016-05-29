@@ -1,3 +1,6 @@
+#ifndef _NT_H_
+#define _NT_H_
+
 #include <stdint.h>
 
 //is used by NT Logger to mark log files with a header, from which also the NT communication version can be retrieved
@@ -142,7 +145,7 @@ class NtRingBuf
 {
 public:
 	// following are public for fast interrupt access.
-	uint8_t slots[NTBUS_BUFSIZE-1];
+	uint8_t slots[NTBUS_BUFSIZE];
 	uint8_t wrtInd;
 	uint8_t unread;
 
@@ -199,3 +202,5 @@ public:
 	 */
 	void writeImuData(tNTBusGetImuData* data, uint8_t status);
 };
+
+#endif
