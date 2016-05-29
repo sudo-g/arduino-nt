@@ -101,8 +101,11 @@ extern volatile uint8_t virtualTIFR2;
 extern volatile uint8_t virtualTCNT2;
 
 // uart0
-#define UBRR0 (virtualUBRR0)
-extern volatile uint16_t virtualUBRR0;
+#define UBRR0H (virtualUBRR0H)
+extern volatile uint8_t virtualUBRR0H;
+
+#define UBRR0L (virtualUBRR0L)
+extern volatile uint8_t virtualUBRR0L;
 
 #define UCSR0A (virtualUCSR0A)
 extern volatile uint8_t virtualUCSR0A;
@@ -110,8 +113,15 @@ extern volatile uint8_t virtualUCSR0A;
 #define UCSR0B (virtualUCSR0B)
 extern volatile uint8_t virtualUCSR0B;
 
+#define UCSR0C (virtualUCSR0C)
+extern volatile uint8_t virtualUCSR0C;
+
 #define UDR0 (virtualUDR0)
 extern volatile uint8_t virtualUDR0;
+
+#define U2X0 1
+#define UCSZ00 1
+#define UCSZ01 2
 
 // twi
 #define TWBR (virtualTWBR)
