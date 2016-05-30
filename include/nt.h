@@ -181,13 +181,22 @@ public:
 
 	/**
 	 * Handle data written to the bus.
+	 *
+	 * \return Byte received from the serial buffer.
 	 */
-	void processBusData();
+	uint8_t processBusData();
+
+	/**
+	 * \return State of the bus communication.
+	 */
+	NtState getBusState() const;
 
 protected:
 	uint8_t matchIdGetData;
 	NtState busState;
 	NtRingBuf* buffer;
+
+	void write(uint8_t c) const;
 };
 
 
@@ -195,12 +204,26 @@ class NtNodeImu : public NtNode
 {
 public:
 	/**
-	 * Writes IMU state to the NT bus.
+	 * Creates a IMU NtNode which matches a specified ID.
 	 *
-	 * \param data   The measurements from the IMU.
-	 * \param status The status of the IMU.
+	 * \param id        NT ID of this IMU node.
+	 * \param imudata   Descriptor of imu measurements.
+	 * \param imustatus The status code of the IMU.
 	 */
-	void writeImuData(tNTBusGetImuData* data, uint8_t status);
+	NtNodeImu(uint8_t id, tNTBusGetImuData* imudata, uint8_t* imustatus);
+
+	/**
+	 * Handle data written to the bus.
+	 *
+	 * \return Byte received from the serial buffer.
+	 */
+	void processBusData();
+
+private:
+	const tNTBusGetImuData* mImudata;
+	const uint8_t* mImustatus;
+
+	void writeImuData() const;
 };
 
 #endif

@@ -28,12 +28,11 @@ bool NtRingBuf::pop(uint8_t* data)
 static NtRingBuf ntBuffer = NtRingBuf();
 
 
-NtNode::NtNode(uint8_t id)
+NtNode::NtNode(uint8_t id) :
+		matchIdGetData(NTBUS_FROM_MASTER | NTBUS_GET | id),
+		busState(IDLE),
+		buffer(&ntBuffer)
 {
-	busState = IDLE;
-	matchIdGetData = NTBUS_FROM_MASTER | NTBUS_GET | id;
-	buffer = &ntBuffer;
-
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
 	UBRR0H = 0;
@@ -49,24 +48,82 @@ NtNode::NtNode(uint8_t id)
 	UCSR0B |= (1<<RXCIE0) | (1<<RXEN0);
 }
 
-void NtNode::processBusData()
+uint8_t NtNode::processBusData()
 {
-	switch (busState)
+	uint8_t recv;
+	if (buffer->pop(&recv))
 	{
-	case IDLE:
-		break;
-	case TRIGGERED:
-		break;
-	case GETDATA:
-		break;
-	case MOTORDATA:
-		break;
+		switch (busState)
+		{
+		case IDLE:
+			if (recv == (NTBUS_STX | NTBUS_TRIGGER))
+			{
+				busState = TRIGGERED;
+			}
+			break;
+		case TRIGGERED:
+			if (recv & (1<<7))
+			{
+				busState = GETDATA;
+			}
+			break;
+		case GETDATA:
+			break;
+		case MOTORDATA:
+			break;
+		}
+	}
+	return recv;
+}
+
+NtNode::NtState NtNode::getBusState() const
+{
+	return busState;
+}
+
+inline void NtNode::write(uint8_t c) const
+{
+	while (!UCSR0A & (1<<TXC0));
+	UDR0 = c;
+}
+
+
+NtNodeImu::NtNodeImu(uint8_t id, tNTBusGetImuData* imudata, uint8_t* imustatus) :
+		NtNode(id),
+		mImudata(imudata),
+		mImustatus(imustatus)
+{
+
+}
+
+void NtNodeImu::processBusData()
+{
+	uint8_t recv = NtNode::processBusData();
+	if (busState == GETDATA)
+	{
+		if (recv == matchIdGetData)
+		{
+			writeImuData();
+		}
+		busState = TRIGGERED;
 	}
 }
 
-void NtNodeImu::writeImuData(tNTBusGetImuData* data, uint8_t status)
+void NtNodeImu::writeImuData() const
 {
+	uint8_t* c;
+	uint8_t crc = 0;
+	for(uint8_t i=0; i<NTBUS_GETIMU_DATALEN-1; i++)
+	{
+		c = (uint8_t*) mImudata;
+		write(*c++);
 
+		crc ^= *c;
+	}
+	c = (uint8_t*) mImustatus;
+	write(*c++);
+	crc ^= *c;
+	write(crc);
 }
 
 
