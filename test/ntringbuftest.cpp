@@ -1,10 +1,13 @@
 #include "ntringbuftest.h"
 #include <assert.h>
 #include <string.h>
+#include <iostream>
 #include "nt.h"
 
 void ntRingBufPopFromBeginTest()
 {
+    std::cout << "ntRingBufPopFromBeginTest\t";
+    
 	// initialize ring buffer
 	NtRingBuf ringbuf = NtRingBuf();
     memset(ringbuf.slots, 0, sizeof(ringbuf.slots));
@@ -22,10 +25,14 @@ void ntRingBufPopFromBeginTest()
 	assert(ringbuf.pop(&buffer));
 	assert(buffer == 2);
 	assert(ringbuf.unread == 0);
+    
+    std::cout << "[PASS]" << std::endl;
 }
 
 void ntRingBufPopWhenEmptyTest()
 {
+    std::cout << "ntRingBufPopWhenEmptyTest\t";
+    
 	// initialize ring buffer
 	NtRingBuf ringbuf = NtRingBuf();
 	ringbuf.wrtInd = 3;
@@ -34,10 +41,14 @@ void ntRingBufPopWhenEmptyTest()
 	assert(!ringbuf.pop(&buffer));
 	assert(ringbuf.unread == 0);
 	assert(ringbuf.wrtInd == 3);
+    
+    std::cout << "[PASS]" << std::endl;
 }
 
 void ntRingBufPopLoopTest()
 {
+    std::cout << "ntRingBufPopLoopTest\t";
+    
 	NtRingBuf ringbuf = NtRingBuf();
     memset(ringbuf.slots, 0, sizeof(ringbuf.slots));
     
@@ -50,4 +61,6 @@ void ntRingBufPopLoopTest()
 	uint8_t buffer;
 	assert(ringbuf.pop(&buffer));
 	assert(buffer == 1);
+    
+    std::cout << "[PASS]" << std::endl;
 }

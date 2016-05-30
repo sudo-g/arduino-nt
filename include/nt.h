@@ -146,18 +146,23 @@ class NtRingBuf
 public:
 	// following are public for fast interrupt access.
 	uint8_t slots[NTBUS_BUFSIZE];
-	uint8_t wrtInd;
-	uint8_t unread;
+	volatile uint8_t wrtInd;
+	volatile uint8_t unread;
 
 	NtRingBuf();
 
 	/**
 	 * Get the last unread byte from buffer.
 	 *
-	 * \param data Buffer to write output to.
+	 * \param out Buffer to write output to.
 	 * \return True if data was read, False if no unread items.
 	 */
-	bool pop(uint8_t* data);
+	bool pop(uint8_t* out);
+
+	/**
+	 * Write a byte into the buffer. Convenience for testing.
+	 */
+	void push(uint8_t data);
 };
 
 
@@ -172,19 +177,30 @@ public:
 		IDLE, TRIGGERED, GETDATA, MOTORDATA
 	};
 
+	const uint8_t matchIdGetData;
+
 	/**
 	 * Creates a NtNode which matches a specified ID.
 	 *
-	 * \param id NT ID which this node responds to.
+	 * \param id     NT ID which this node responds to.
+	 * \param buffer The ring buffer to read serial from.
 	 */
-	NtNode(uint8_t id);
+	NtNode(uint8_t id, NtRingBuf* buffer);
+
+	/**
+	 * Create a NtNode which is linked to module's buffer.
+	 *
+	 * \param id NT ID which this node response to.
+	 */
+	static NtNode createNtNode(uint8_t id);
 
 	/**
 	 * Handle data written to the bus.
 	 *
-	 * \return Byte received from the serial buffer.
+	 * \param recv Byte received from the serial buffer.
+	 * \return True if data was read, False otherwise.
 	 */
-	uint8_t processBusData();
+	bool processBusData(uint8_t* data);
 
 	/**
 	 * \return State of the bus communication.
@@ -192,7 +208,6 @@ public:
 	NtState getBusState() const;
 
 protected:
-	const uint8_t matchIdGetData;
 	NtState busState;
 	NtRingBuf* buffer;
 
@@ -207,17 +222,19 @@ public:
 	 * Creates a IMU NtNode which matches a specified ID.
 	 *
 	 * \param id        NT ID of this IMU node.
+	 * \param buffer    The ring buffer to read serial from.
 	 * \param imudata   Descriptor of imu measurements.
 	 * \param imustatus The status code of the IMU.
 	 */
-	NtNodeImu(uint8_t id, tNTBusGetImuData* imudata, uint8_t* imustatus);
+	NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint8_t* imustatus);
 
 	/**
 	 * Handle data written to the bus.
 	 *
+	 * \param recv Byte received from the serial buffer.
 	 * \return Byte received from the serial buffer.
 	 */
-	void processBusData();
+	bool processBusData(uint8_t* data);
 
 private:
 	const tNTBusGetImuData* mImudata;
