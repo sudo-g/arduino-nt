@@ -119,9 +119,23 @@ extern volatile uint8_t virtualUCSR0C;
 #define UDR0 (virtualUDR0)
 extern volatile uint8_t virtualUDR0;
 
+#define MPCM0 0
 #define U2X0 1
+#define UPE0 2
+#define DOR0 3
+#define FE0 4
+#define UDRE0 5
+#define TXC0 6
+#define RXC0 7
+
+#define UCPOL0 0
 #define UCSZ00 1
+#define UCPHA0 1
 #define UCSZ01 2
+#define UDORD0 2
+#define USBS0 3
+#define UPM00 4
+#define UPM01 5
 
 // twi
 #define TWBR (virtualTWBR)
