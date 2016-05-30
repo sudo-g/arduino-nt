@@ -192,7 +192,7 @@ public:
 	NtState getBusState() const;
 
 protected:
-	uint8_t matchIdGetData;
+	const uint8_t matchIdGetData;
 	NtState busState;
 	NtRingBuf* buffer;
 

@@ -4,10 +4,9 @@
 
 #define BUF_SIZE_MASK (NTBUS_BUFSIZE-1)
 
-NtRingBuf::NtRingBuf()
+NtRingBuf::NtRingBuf() : wrtInd(0), unread(0)
 {
-	wrtInd = 0;
-	unread = 0;
+
 }
 
 bool NtRingBuf::pop(uint8_t* data)
