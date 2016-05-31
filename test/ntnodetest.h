@@ -2,8 +2,10 @@
 #define _NTNODETEST_H_
 
 void ntNodeMatchIdTest();
-void ntNodeTriggerTest();
+void ntNodeTriggerPositiveTest();
+void ntNodeTriggerNegativeTest();
 void ntNodeToGetdataStatePositiveTest();
 void ntNodeToGetdataStateNegativeTest();
+void ntNodeToMotordataStatePositiveTest();
 
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ntringbuftest.h"
 #include "ntnodetest.h"
+#include "ntnodeimutest.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,9 +13,15 @@ int main(int argc, char *argv[])
     
     std::cout << std::endl << "Executing ntNode suite of tests..." << std::endl;
     ntNodeMatchIdTest();
-    ntNodeTriggerTest();
+    ntNodeTriggerPositiveTest();
+    ntNodeTriggerNegativeTest();
     ntNodeToGetdataStatePositiveTest();
     ntNodeToGetdataStateNegativeTest();
+    ntNodeToMotordataStatePositiveTest();
+    
+    std::cout << std::endl << "Executing ntNode suite of tests..." << std::endl;
+    ntNodeImuTriggerPositiveTest();
+    ntNodeImuTriggerNegativeTest();
     
     std::cout << std::endl;
     

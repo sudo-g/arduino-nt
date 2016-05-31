@@ -13,9 +13,9 @@ void ntNodeMatchIdTest()
     std::cout << "[PASS]" << std::endl;
 }
 
-void ntNodeTriggerTest()
+void ntNodeTriggerPositiveTest()
 {
-    std::cout << "ntNodeTriggerTest\t";
+    std::cout << "ntNodeTriggerPositiveTest\t";
     
     NtRingBuf buffer = NtRingBuf();
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
@@ -25,6 +25,22 @@ void ntNodeTriggerTest()
     uint8_t recv;
     ntNode.processBusData(&recv);
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    
+    std::cout << "[PASS]" << std::endl;
+}
+
+void ntNodeTriggerNegativeTest()
+{
+    std::cout << "ntNodeTriggerNegativeTest\t";
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
+    
+    buffer.push(1<<7);
+    
+    uint8_t recv;
+    ntNode.processBusData(&recv);
+    assert(ntNode.getBusState() == NtNode::IDLE);
     
     std::cout << "[PASS]" << std::endl;
 }
@@ -54,11 +70,30 @@ void ntNodeToGetdataStateNegativeTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_GET | NTBUS_ID_IMU1);
+    buffer.push(0x43);
     
     uint8_t recv;
     while (ntNode.processBusData(&recv));
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    
+    std::cout << "[PASS]" << std::endl;
+}
+
+void ntNodeToMotordataStatePositiveTest()
+{
+    std::cout << "ntNodeToMotordataStatePositiveTest\t";
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
+    
+    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
+    buffer.push(NTBUS_STX | NTBUS_ID_IMU1);
+    buffer.push(0x42);
+    buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
+    
+    uint8_t recv;
+    while (ntNode.processBusData(&recv));
+    assert(ntNode.getBusState() == NtNode::MOTORDATA);
     
     std::cout << "[PASS]" << std::endl;
 }
