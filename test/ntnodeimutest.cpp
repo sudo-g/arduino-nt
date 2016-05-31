@@ -31,7 +31,7 @@ void ntNodeImuTriggerNegativeTest()
     NtRingBuf buffer = NtRingBuf();
     NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, &imustatus);
     
-    buffer.push(1<<7);
+    buffer.push(NTBUS_STX);
     
     uint8_t recv;
     ntNodeImu.processBusData(&recv);

@@ -73,7 +73,7 @@ bool NtNode::processBusData(uint8_t* recv)
 			}
 			break;
 		case TRIGGERED:
-			if (*recv & (1<<7))
+			if ((*recv & NTBUS_STX) && (*recv & NTBUS_GET))
 			{
 				busState = GETDATA;
 			}

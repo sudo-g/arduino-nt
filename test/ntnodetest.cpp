@@ -53,7 +53,7 @@ void ntNodeToGetdataStatePositiveTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX);
+    buffer.push(NTBUS_STX | NTBUS_GET);
     
     uint8_t recv;
     while (ntNode.processBusData(&recv));
@@ -70,7 +70,7 @@ void ntNodeToGetdataStateNegativeTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(0x43);
+    buffer.push(NTBUS_STX);
     
     uint8_t recv;
     while (ntNode.processBusData(&recv));
@@ -87,7 +87,7 @@ void ntNodeToMotordataStatePositiveTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_ID_IMU1);
+    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
     buffer.push(0x42);
     buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
     
