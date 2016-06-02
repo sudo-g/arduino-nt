@@ -120,8 +120,8 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 		if (*recv == matchIdGetData)
 		{
 			writeImuData();
+			busState = TRIGGERED;
 		}
-		busState = TRIGGERED;
 	}
 	return ret;
 }

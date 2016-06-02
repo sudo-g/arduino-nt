@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl << "Executing ntNode suite of tests..." << std::endl;
     ntNodeImuTriggerPositiveTest();
     ntNodeImuTriggerNegativeTest();
+    ntNodeImuToGetdataStatePositiveTest();
     
     std::cout << std::endl;
     

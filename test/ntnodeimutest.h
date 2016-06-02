@@ -3,5 +3,6 @@
 
 void ntNodeImuTriggerPositiveTest();
 void ntNodeImuTriggerNegativeTest();
+void ntNodeImuToGetdataStatePositiveTest();
 
 #endif
