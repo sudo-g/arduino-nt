@@ -7,5 +7,6 @@ void ntNodeTriggerNegativeTest();
 void ntNodeToGetdataStatePositiveTest();
 void ntNodeToGetdataStateNegativeTest();
 void ntNodeToMotordataStatePositiveTest();
+void ntNodeUntriggerTest();
 
 #endif

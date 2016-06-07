@@ -73,18 +73,26 @@ bool NtNode::processBusData(uint8_t* recv)
 			}
 			break;
 		case TRIGGERED:
-			if ((*recv & NTBUS_STX) && (*recv & NTBUS_GET))
+			if (*recv == matchIdGetData)
 			{
 				busState = GETDATA;
 			}
-			break;
-		case GETDATA:
-			if (*recv == (NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL))
+			else if (*recv == (NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL))
 			{
 				busState = MOTORDATA;
 			}
 			break;
+		case GETDATA:
+			// specific NtNode types execute this state's events and resets the state.
+			break;
 		case MOTORDATA:
+			// is the responsibility of the specific NtNode to act on this.
+			mtrDatChars++;
+			if (mtrDatChars >= 10)
+			{
+				busState = IDLE;
+			}
+
 			break;
 		}
 	}
@@ -103,10 +111,10 @@ inline void NtNode::write(uint8_t c) const
 }
 
 
-NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint8_t* imustatus) :
+NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model) :
 		NtNode(id, buffer),
 		mImudata(imudata),
-		mImustatus(imustatus)
+		modelCode(model)
 {
 
 }
@@ -117,10 +125,26 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 	bool ret = NtNode::processBusData(recv);
 	if (busState == GETDATA)
 	{
-		if (*recv == matchIdGetData)
+		if (*recv == NTBUS_CMD_GETSTATUS)
 		{
-			writeImuData();
-			busState = TRIGGERED;
+			// enable TX line
+			UCSR0B |= (1<<TXEN0);
+
+			// write data
+			// TODO
+
+			// disable TX line
+			UCSR0B &= (1<<TXEN0);
+		}
+		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
+		{
+			uint8_t* c = (uint8_t*) &modelCode;
+			uint8_t crc;
+			for (uint8_t i=0; i<NTBUS_CMDGETCONFIGURATION_DATALEN; i++)
+			{
+				write(*(c++));
+				crc ^= *c;
+			}
 		}
 	}
 	return ret;
@@ -128,17 +152,14 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 
 void NtNodeImu::writeImuData() const
 {
-	uint8_t* c;
+	uint8_t* c = (uint8_t*) mImudata;
 	uint8_t crc = 0;
-	for(uint8_t i=0; i<NTBUS_GETIMU_DATALEN-1; i++)
+	for(uint8_t i=0; i<NTBUS_GETIMU_DATALEN; i++)
 	{
-		c = (uint8_t*) mImudata;
-		write(*c++);
-
+		write(*(c++));
 		crc ^= *c;
 	}
-	c = (uint8_t*) mImustatus;
-	write(*c++);
+    
 	crc ^= *c;
 	write(crc);
 }

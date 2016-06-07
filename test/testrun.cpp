@@ -18,11 +18,12 @@ int main(int argc, char *argv[])
     ntNodeToGetdataStatePositiveTest();
     ntNodeToGetdataStateNegativeTest();
     ntNodeToMotordataStatePositiveTest();
+    ntNodeUntriggerTest();
     
     std::cout << std::endl << "Executing ntNode suite of tests..." << std::endl;
     ntNodeImuTriggerPositiveTest();
     ntNodeImuTriggerNegativeTest();
-    ntNodeImuToGetdataStatePositiveTest();
+    ntNodeImuToGetstatusPositiveTest();
     
     std::cout << std::endl;
     

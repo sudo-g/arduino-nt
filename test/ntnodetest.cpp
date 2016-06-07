@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include <avr/io.h>
 #include "nt.h"
 
 void ntNodeMatchIdTest()
@@ -9,6 +10,7 @@ void ntNodeMatchIdTest()
     NtNode ntNode = NtNode::createNtNode(NTBUS_ID_IMU1);
     assert(ntNode.matchIdGetData == 0xB1);
     assert(ntNode.getBusState() == NtNode::IDLE);
+    assert((UCSR0B & (1<<RXEN0)) && (UCSR0B & (1<<RXCIE0)));
     
     std::cout << "[PASS]" << std::endl;
 }
@@ -53,7 +55,7 @@ void ntNodeToGetdataStatePositiveTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_GET);
+    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
     
     uint8_t recv;
     while (ntNode.processBusData(&recv));
@@ -87,13 +89,33 @@ void ntNodeToMotordataStatePositiveTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
-    buffer.push(0x42);
     buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
     
     uint8_t recv;
     while (ntNode.processBusData(&recv));
     assert(ntNode.getBusState() == NtNode::MOTORDATA);
+    
+    std::cout << "[PASS]" << std::endl;
+}
+
+void ntNodeUntriggerTest()
+{
+    std::cout << "ntNodeUntriggerTest\t";
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
+    
+    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
+    buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
+    
+    for (uint8_t i=0; i<10; i++)
+    {
+        buffer.push(i);
+    }
+    
+    uint8_t recv;
+    while (ntNode.processBusData(&recv));
+    assert(ntNode.getBusState() == NtNode::IDLE);
     
     std::cout << "[PASS]" << std::endl;
 }

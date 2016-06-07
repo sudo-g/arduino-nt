@@ -210,8 +210,10 @@ public:
 protected:
 	NtState busState;
 	NtRingBuf* buffer;
+	uint8_t mtrDatChars = 0;
 
 	void write(uint8_t c) const;
+	void writeFrame(uint8_t* frame, uint8_t len);
 };
 
 
@@ -223,10 +225,10 @@ public:
 	 *
 	 * \param id        NT ID of this IMU node.
 	 * \param buffer    The ring buffer to read serial from.
-	 * \param imudata   Descriptor of imu measurements.
-	 * \param imustatus The status code of the IMU.
+	 * \param imudata   Descriptor of IMU measurements.
+	 * \param model     Model of IMU used.
 	 */
-	NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint8_t* imustatus);
+	NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model);
 
 	/**
 	 * Handle data written to the bus.
@@ -238,7 +240,7 @@ public:
 
 private:
 	const tNTBusGetImuData* mImudata;
-	const uint8_t* mImustatus;
+	const uint16_t modelCode;
 
 	void writeImuData() const;
 };

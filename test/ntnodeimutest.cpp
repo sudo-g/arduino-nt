@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include <avr/io.h>
 #include "nt.h"
 
 void ntNodeImuTriggerPositiveTest()
@@ -7,10 +8,9 @@ void ntNodeImuTriggerPositiveTest()
     std::cout << "ntNodeImuTriggerPositiveTest\t";
     
     tNTBusGetImuData imudata;
-    uint8_t imustatus;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, &imustatus);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
     
@@ -26,10 +26,9 @@ void ntNodeImuTriggerNegativeTest()
     std::cout << "ntNodeImuTriggerPositiveTest\t";
     
     tNTBusGetImuData imudata;
-    uint8_t imustatus;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, &imustatus);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     buffer.push(NTBUS_STX);
     
@@ -40,23 +39,30 @@ void ntNodeImuTriggerNegativeTest()
     std::cout << "[PASS]" << std::endl;
 }
 
-void ntNodeImuToGetdataStatePositiveTest()
+void ntNodeImuToGetstatusPositiveTest()
 {
     std::cout << "ntNodeImuToGetdataStatePositiveTest\t";
     
     tNTBusGetImuData imudata;
-    uint8_t imustatus;
+    imudata.AccX = 1;
+    imudata.AccY = 2;
+    imudata.AccZ = 3;
+    imudata.GyroX = 5;
+    imudata.GyroY = 6;
+    imudata.GyroZ = 4;
+    imudata.Temp = 7;
+    imudata.ImuStatus = 0x01;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, &imustatus);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_GET);
+    buffer.push(NTBUS_STX | NTBUS_GET | NTBUS_ID_IMU1);
     
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
     while (ntNodeImu.processBusData(&recv));
-    assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
+    assert(ntNodeImu.getBusState() == NtNode::GETDATA);
     
     std::cout << "[PASS]" << std::endl;
 }
