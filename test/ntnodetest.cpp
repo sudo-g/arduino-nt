@@ -119,3 +119,30 @@ void ntNodeUntriggerTest()
     
     std::cout << "[PASS]" << std::endl;
 }
+
+void ntNodeGetVersionStrTest()
+{
+    std::cout << "ntNodeUntriggerTest\t";
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
+    
+    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
+    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
+    buffer.push(NTBUS_CMD_GETVERSIONSTR);
+    
+    uint8_t recv;
+    while (ntNode.processBusData(&recv));
+    assert(ntNode.getBusState() == NtNode::TRIGGERED);
+}
+
+void ntCrcCalcTest()
+{
+    std::cout << "ntcrcCalcTest\t";
+    
+    uint8_t frame[] = {0x00, 0x01, 0x02, 0x03, 0x04};
+    
+    assert(0x04 == ntcrc(frame, sizeof(frame)));
+    
+    std::cout << "[PASS]" << std::endl;
+}

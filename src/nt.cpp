@@ -139,7 +139,7 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
 		{
 			uint8_t* c = (uint8_t*) &modelCode;
-			uint8_t crc;
+			uint8_t crc = 0;
 			for (uint8_t i=0; i<NTBUS_CMDGETCONFIGURATION_DATALEN; i++)
 			{
 				write(*(c++));
@@ -154,14 +154,25 @@ void NtNodeImu::writeImuData() const
 {
 	uint8_t* c = (uint8_t*) mImudata;
 	uint8_t crc = 0;
-	for(uint8_t i=0; i<NTBUS_GETIMU_DATALEN; i++)
+	for (uint8_t i=0; i<NTBUS_GETIMU_DATALEN; i++)
 	{
 		write(*(c++));
 		crc ^= *c;
 	}
     
-	crc ^= *c;
 	write(crc);
+}
+
+
+uint8_t ntcrc(uint8_t* frame, uint8_t length)
+{
+	uint8_t crc = 0;
+	for (uint8_t i=0; i<length; i++)
+	{
+		crc ^= frame[i];
+	}
+
+	return crc;
 }
 
 

@@ -8,5 +8,7 @@ void ntNodeToGetdataStatePositiveTest();
 void ntNodeToGetdataStateNegativeTest();
 void ntNodeToMotordataStatePositiveTest();
 void ntNodeUntriggerTest();
+void ntNodeGetVersionStrTest();
+void ntCrcCalcTest();
 
 #endif

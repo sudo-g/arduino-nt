@@ -245,4 +245,13 @@ private:
 	void writeImuData() const;
 };
 
+/**
+ * Calculate checksum of a NT frame.
+ *
+ * \param frame  Frame data.
+ * \param length The length of the frame.
+ * \return Checksum value of the frame.
+ */
+uint8_t ntcrc(uint8_t* frame, uint8_t length);
+
 #endif
