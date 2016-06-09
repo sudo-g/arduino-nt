@@ -1,6 +1,10 @@
 #ifndef _AVRTESTUTIL_H_
 #define _AVRTESTUTIL_H_
 
+#include <pthread.h>
+
+extern pthread_mutex_t usart_write_lock;
+
 /**
  * Starts simulation of UART0 hardware.
  *
