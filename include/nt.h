@@ -201,14 +201,11 @@ public:
 	 */
 	bool processBusData(uint8_t* data);
 
-	/**
-	 * \return State of the bus communication.
-	 */
-	NtState getBusState() const;
+protected:
+	NtState busState = IDLE;
 
 private:
 	NtRingBuf* buffer;
-	NtState busState;
 	uint8_t mtrDatChars = 0;
 };
 

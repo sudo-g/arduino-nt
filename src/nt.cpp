@@ -37,8 +37,8 @@ static NtRingBuf ntBuffer = NtRingBuf();
 
 NtNode::NtNode(uint8_t id, NtRingBuf* buffer) :
 		matchIdGetData(NTBUS_STX | NTBUS_GET | id),
-		buffer(buffer),
-		busState(IDLE)
+		busState(IDLE),
+		buffer(buffer)
 {
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
@@ -113,11 +113,6 @@ bool NtNode::processBusData(uint8_t* recv)
 	return ret;
 }
 
-inline NtNode::NtState NtNode::getBusState() const
-{
-	return busState;
-}
-
 
 NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model) :
 		NtNode(id, buffer),
@@ -131,7 +126,7 @@ NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, u
 bool NtNodeImu::processBusData(uint8_t* recv)
 {
 	bool ret = NtNode::processBusData(recv);
-	if (getBusState() == GETDATA)
+	if (busState == GETDATA)
 	{
 		if (*recv == NTBUS_CMD_GETSTATUS)
 		{
@@ -149,6 +144,8 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 			writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
 			UCSR0B &= (1<<TXEN0);    // disable TX line
 		}
+
+		busState = TRIGGERED;
 	}
 	return ret;
 }
