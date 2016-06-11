@@ -194,6 +194,11 @@ public:
 	static NtNode createNtNode(uint8_t id);
 
 	/**
+	 * \return The state of the NT bus.
+	 */
+	NtState getBusState() const;
+
+	/**
 	 * Handle data written to the bus.
 	 *
 	 * \param recv Byte received from the serial buffer.

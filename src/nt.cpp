@@ -61,6 +61,11 @@ NtNode NtNode::createNtNode(uint8_t id)
 	return ntNode;
 }
 
+NtNode::NtState NtNode::getBusState() const
+{
+	return busState;
+}
+
 bool NtNode::processBusData(uint8_t* recv)
 {
 	const bool ret = buffer->pop(recv);
