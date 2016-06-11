@@ -5,14 +5,17 @@
 
 #define TEST_USART_BUFSIZE 256
 
-extern pthread_mutex_t usart_write_lock;
-extern uint8_t usartbuf[TEST_USART_BUFSIZE];
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/**
- * Starts simulation of UART0 hardware.
- *
- * \return Non-zero if success, 0 for failure.
- */
-int usart0_init(void);
+    extern uint8_t usart0buf[TEST_USART_BUFSIZE];
+    extern unsigned int usart0buf_inx;
+    
+    void usart0_reset(void);
+    
+#ifdef __cplusplus
+}
+#endif
 
 #endif

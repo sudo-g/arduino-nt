@@ -96,6 +96,7 @@ bool NtNode::processBusData(uint8_t* recv)
 				writeFrame((uint8_t*) vStrData.VersionStr, NTBUS_CMDGETVERSIONSTR_DATALEN);
 				UCSR0B &= (1<<TXEN0);    // disable TX line
 
+				busState = TRIGGERED;
 			}
 			break;
 		case MOTORDATA:

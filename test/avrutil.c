@@ -1,15 +1,11 @@
 #include "avrutil.h"
+#include <stdio.h>
 #include "avrtestutil.h"
-#include <avr/io.h>
-#include <pthread.h>
+
+#define TEST_USART_BUFSIZE 256
 
 void usart0_write(uint8_t c)
 {
-    // prevent cases where UDR has not changed but TX status is busy.
-    pthread_mutex_lock(&usart_write_lock);
-    
-    UCSR0A |= (1<<TXC0);
-    UDR0 = c;
-    
-    pthread_mutex_unlock(&usart_write_lock);
+    usart0buf[usart0buf_inx & (TEST_USART_BUFSIZE-1)] = c;
+    usart0buf_inx++;
 }

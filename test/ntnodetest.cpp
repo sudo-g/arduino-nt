@@ -1,7 +1,9 @@
 #include <assert.h>
 #include <iostream>
 #include <avr/io.h>
+#include <string.h>
 #include "nt.h"
+#include "avrtestutil.h"
 
 void ntNodeMatchIdTest()
 {
@@ -122,7 +124,7 @@ void ntNodeUntriggerTest()
 
 void ntNodeGetVersionStrTest()
 {
-    std::cout << "ntNodeUntriggerTest\t";
+    std::cout << "ntNodeGetVersionStrTest\t";
     
     NtRingBuf buffer = NtRingBuf();
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, &buffer);
@@ -134,6 +136,13 @@ void ntNodeGetVersionStrTest()
     uint8_t recv;
     while (ntNode.processBusData(&recv));
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    
+    const uint8_t reference[NTBUS_CMDGETVERSIONSTR_DATALEN] = STORM32NTBUS_VERSIONSTR;
+    assert(memcmp(reference, usart0buf, NTBUS_CMDGETVERSIONSTR_DATALEN) == 0);
+    
+    usart0_reset();
+    
+    std::cout << "[PASS]" << std::endl;
 }
 
 void ntCrcCalcTest()
