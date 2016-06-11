@@ -142,15 +142,17 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 			UCSR0B |= (1<<TXEN0);    // enable TX line
 			writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
 			UCSR0B &= (1<<TXEN0);    // disable TX line
+            
+            busState = TRIGGERED;
 		}
 		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
 		{
 			UCSR0B |= (1<<TXEN0);    // enable TX line
 			writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
 			UCSR0B &= (1<<TXEN0);    // disable TX line
+            
+            busState = TRIGGERED;
 		}
-
-		busState = TRIGGERED;
 	}
 	return ret;
 }
