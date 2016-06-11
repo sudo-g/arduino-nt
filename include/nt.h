@@ -212,7 +212,6 @@ protected:
 	NtRingBuf* buffer;
 	uint8_t mtrDatChars = 0;
 
-	void write(uint8_t c) const;
 	void writeFrame(uint8_t* frame, uint8_t len);
 };
 

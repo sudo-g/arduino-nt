@@ -1,6 +1,7 @@
 #include "nt.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include "avrutil.h"
 
 #define BUF_SIZE_MASK (NTBUS_BUFSIZE-1)
 
@@ -83,7 +84,11 @@ bool NtNode::processBusData(uint8_t* recv)
 			}
 			break;
 		case GETDATA:
-			// specific NtNode types execute this state's events and resets the state.
+			// specific NtNode types may have its own actions.
+			if (*recv == NTBUS_CMD_GETVERSIONSTR)
+			{
+
+			}
 			break;
 		case MOTORDATA:
 			// is the responsibility of the specific NtNode to act on this.
@@ -102,12 +107,6 @@ bool NtNode::processBusData(uint8_t* recv)
 NtNode::NtState NtNode::getBusState() const
 {
 	return busState;
-}
-
-inline void NtNode::write(uint8_t c) const
-{
-	while (!UCSR0A & (1<<TXC0));
-	UDR0 = c;
 }
 
 
@@ -142,7 +141,7 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 			uint8_t crc = 0;
 			for (uint8_t i=0; i<NTBUS_CMDGETCONFIGURATION_DATALEN; i++)
 			{
-				write(*(c++));
+				usart0_write(*(c++));
 				crc ^= *c;
 			}
 		}
@@ -156,11 +155,11 @@ void NtNodeImu::writeImuData() const
 	uint8_t crc = 0;
 	for (uint8_t i=0; i<NTBUS_GETIMU_DATALEN; i++)
 	{
-		write(*(c++));
+		usart0_write(*(c++));
 		crc ^= *c;
 	}
     
-	write(crc);
+	usart0_write(crc);
 }
 
 

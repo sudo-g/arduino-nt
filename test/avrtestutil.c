@@ -2,8 +2,6 @@
 #include <avr/io.h>
 #include "avrtestutil.h"
 
-#define TEST_USART_BUFSIZE 255
-
 pthread_mutex_t usart_write_lock;
 
 uint8_t usartbuf[TEST_USART_BUFSIZE];
@@ -18,7 +16,7 @@ void *usarthwrite_task(void* arg)
         if (UCSR0A & (1<<TXC0))
         {
             pthread_mutex_unlock(&usart_write_lock);
-            usartbuf[usartbuf_inx] = UDR0;
+            usartbuf[usartbuf_inx & (TEST_USART_BUFSIZE-1)] = UDR0;
             
             // TX status longer busy
             UCSR0A &= (1<<TXC0);
