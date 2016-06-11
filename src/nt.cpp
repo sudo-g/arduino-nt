@@ -1,6 +1,7 @@
 #include "nt.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <string.h>
 #include "avrutil.h"
 
 #define BUF_SIZE_MASK (NTBUS_BUFSIZE-1)
@@ -35,9 +36,9 @@ static NtRingBuf ntBuffer = NtRingBuf();
 
 
 NtNode::NtNode(uint8_t id, NtRingBuf* buffer) :
-		matchIdGetData(NTBUS_FROM_MASTER | NTBUS_GET | id),
-		busState(IDLE),
-		buffer(buffer)
+		matchIdGetData(NTBUS_STX | NTBUS_GET | id),
+		buffer(buffer),
+		busState(IDLE)
 {
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
@@ -87,6 +88,13 @@ bool NtNode::processBusData(uint8_t* recv)
 			// specific NtNode types may have its own actions.
 			if (*recv == NTBUS_CMD_GETVERSIONSTR)
 			{
+				tNTBusCmdGetVersionStrData vStrData;
+				memset(vStrData.VersionStr, 0, NTBUS_CMDGETVERSIONSTR_DATALEN);
+				strcpy(vStrData.VersionStr, STORM32NTBUS_VERSIONSTR);
+
+				UCSR0B |= (1<<TXEN0);    // enable TX line
+				writeFrame((uint8_t*) vStrData.VersionStr, NTBUS_CMDGETVERSIONSTR_DATALEN);
+				UCSR0B &= (1<<TXEN0);    // disable TX line
 
 			}
 			break;
@@ -104,7 +112,7 @@ bool NtNode::processBusData(uint8_t* recv)
 	return ret;
 }
 
-NtNode::NtState NtNode::getBusState() const
+inline NtNode::NtState NtNode::getBusState() const
 {
 	return busState;
 }
@@ -122,28 +130,23 @@ NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, u
 bool NtNodeImu::processBusData(uint8_t* recv)
 {
 	bool ret = NtNode::processBusData(recv);
-	if (busState == GETDATA)
+	if (getBusState() == GETDATA)
 	{
 		if (*recv == NTBUS_CMD_GETSTATUS)
 		{
-			// enable TX line
-			UCSR0B |= (1<<TXEN0);
+			tNTBusCmdGetStatusData statusData;
+			statusData.Status = NTBUS_IMU_STATUS_IMU_PRESENT;
+			statusData.State = mImudata->ImuStatus;
 
-			// write data
-			// TODO
-
-			// disable TX line
-			UCSR0B &= (1<<TXEN0);
+			UCSR0B |= (1<<TXEN0);    // enable TX line
+			writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
+			UCSR0B &= (1<<TXEN0);    // disable TX line
 		}
 		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
 		{
-			uint8_t* c = (uint8_t*) &modelCode;
-			uint8_t crc = 0;
-			for (uint8_t i=0; i<NTBUS_CMDGETCONFIGURATION_DATALEN; i++)
-			{
-				usart0_write(*(c++));
-				crc ^= *c;
-			}
+			UCSR0B |= (1<<TXEN0);    // enable TX line
+			writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
+			UCSR0B &= (1<<TXEN0);    // disable TX line
 		}
 	}
 	return ret;
@@ -159,6 +162,19 @@ void NtNodeImu::writeImuData() const
 		crc ^= *c;
 	}
     
+	usart0_write(crc);
+}
+
+
+void writeFrame(uint8_t* frame, uint8_t len)
+{
+	uint8_t crc = 0;
+	for (uint8_t i=0; i<len; i++)
+	{
+		usart0_write(*(frame++));
+		crc ^= *frame;
+	}
+
 	usart0_write(crc);
 }
 

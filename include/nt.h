@@ -7,7 +7,6 @@
 #define STORM32NTBUS_VERSION             003
 #define STORM32NTBUS_VERSIONSTR          "v0.03"
 
-#define NTBUS_FROM_MASTER                 (1<<7)
 #define NTBUS_BUFSIZE                     16
 
 // NT MODULE ID LIST
@@ -207,12 +206,10 @@ public:
 	 */
 	NtState getBusState() const;
 
-protected:
-	NtState busState;
+private:
 	NtRingBuf* buffer;
+	NtState busState;
 	uint8_t mtrDatChars = 0;
-
-	void writeFrame(uint8_t* frame, uint8_t len);
 };
 
 
@@ -243,6 +240,14 @@ private:
 
 	void writeImuData() const;
 };
+
+/**
+ * Write a whole frame to the NT bus.
+ *
+ * \param frame The frame to write.
+ * \param len   Length of the frame in bytes.
+ */
+void writeFrame(uint8_t* frame, uint8_t len);
 
 /**
  * Calculate checksum of a NT frame.
