@@ -81,6 +81,7 @@ void ntNodeToGetdataStateNegativeTest()
     
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
     
     std::cout << "[PASS]" << std::endl;
@@ -98,6 +99,7 @@ void ntNodeToMotordataStatePositiveTest()
     
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNode.getBusState() == NtNode::MOTORDATA);
     
     std::cout << "[PASS]" << std::endl;
@@ -138,6 +140,7 @@ void ntNodeGetVersionStrTest()
     
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
     
     const uint8_t reference[NTBUS_CMDGETVERSIONSTR_DATALEN] = STORM32NTBUS_VERSIONSTR;
@@ -166,6 +169,7 @@ void ntNodeGetBoardStrTest()
     
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
     
     tNTBusCmdGetBoardStrData referenceFrame;

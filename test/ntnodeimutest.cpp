@@ -72,7 +72,7 @@ void ntNodeImuGetstatusTest()
     // request status data.
     buffer.push(NTBUS_CMD_GETSTATUS);
     ntNodeImu.processBusData(&recv);
-    
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
     
     // check USART buffer has the correct values.
@@ -124,7 +124,7 @@ void ntNodeImuGetconfigurationTest()
     // request status data.
     buffer.push(NTBUS_CMD_GETCONFIGURATION);
     ntNodeImu.processBusData(&recv);
-    
+    assert(!(UCSR0B & (1<<TXEN0)));
     assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
     
     // check USART buffer has the correct values.
