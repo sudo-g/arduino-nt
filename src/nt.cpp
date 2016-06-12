@@ -6,6 +6,8 @@
 
 #define BUF_SIZE_MASK (NTBUS_BUFSIZE-1)
 
+static void writeFrame(uint8_t* frame, uint8_t len);
+
 NtRingBuf::NtRingBuf() : wrtInd(0), unread(0)
 {
 

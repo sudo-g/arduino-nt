@@ -253,14 +253,6 @@ private:
 };
 
 /**
- * Write a whole frame to the NT bus.
- *
- * \param frame The frame to write.
- * \param len   Length of the frame in bytes.
- */
-void writeFrame(uint8_t* frame, uint8_t len);
-
-/**
  * Calculate checksum of a NT frame.
  *
  * \param frame  Frame data.
