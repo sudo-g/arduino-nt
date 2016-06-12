@@ -5,7 +5,6 @@ void ntNodeMatchIdTest();
 void ntNodeNameTest();
 void ntNodeTriggerPositiveTest();
 void ntNodeTriggerNegativeTest();
-void ntNodeToGetdataStatePositiveTest();
 void ntNodeToGetdataStateNegativeTest();
 void ntNodeToMotordataStatePositiveTest();
 void ntNodeUntriggerTest();

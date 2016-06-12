@@ -66,7 +66,7 @@ void ntNodeImuGetstatusTest()
     
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
-    while (ntNodeImu.processBusData(&recv));
+    while (ntNodeImu.processBusData(&recv) >= 0);
     assert(ntNodeImu.getBusState() == NtNode::GETDATA);
     
     // request status data.
@@ -118,7 +118,7 @@ void ntNodeImuGetconfigurationTest()
     
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
-    while (ntNodeImu.processBusData(&recv));
+    while (ntNodeImu.processBusData(&recv) >= 0);
     assert(ntNodeImu.getBusState() == NtNode::GETDATA);
     
     // request status data.

@@ -210,9 +210,9 @@ public:
 	 * Handle data written to the bus.
 	 *
 	 * \param recv Byte received from the serial buffer.
-	 * \return True if data was read, False otherwise.
+	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
 	 */
-	bool processBusData(uint8_t* data);
+	int8_t processBusData(uint8_t* data);
 
 protected:
 	NtState busState = IDLE;
@@ -241,9 +241,9 @@ public:
 	 * Handle data written to the bus.
 	 *
 	 * \param recv Byte received from the serial buffer.
-	 * \return Byte received from the serial buffer.
+	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
 	 */
-	bool processBusData(uint8_t* data);
+	int8_t processBusData(uint8_t* data);
 
 private:
 	const tNTBusGetImuData* mImudata;

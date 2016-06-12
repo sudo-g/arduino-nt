@@ -75,11 +75,13 @@ NtNode::NtState NtNode::getBusState() const
 	return busState;
 }
 
-bool NtNode::processBusData(uint8_t* recv)
+int8_t NtNode::processBusData(uint8_t* recv)
 {
-	const bool ret = buffer->pop(recv);
-	if (ret)
+	const bool hasChar = buffer->pop(recv);
+	int8_t rc = -1;
+	if (hasChar)
 	{
+		rc = 0;
 		switch (busState)
 		{
 		case IDLE:
@@ -99,7 +101,6 @@ bool NtNode::processBusData(uint8_t* recv)
 			}
 			break;
 		case GETDATA:
-			// specific NtNode types may have its own actions.
 			if (*recv == NTBUS_CMD_GETVERSIONSTR)
 			{
 				tNTBusCmdGetVersionStrData vStrData;
@@ -112,19 +113,19 @@ bool NtNode::processBusData(uint8_t* recv)
 
 				busState = TRIGGERED;
 			}
+			rc = 1;    // specific NtNode types may have its own actions.
 			break;
 		case MOTORDATA:
-			// is the responsibility of the specific NtNode to act on this.
 			mtrDatChars++;
 			if (mtrDatChars >= 10)
 			{
 				busState = IDLE;
 			}
-
+			rc = 1;    // is the responsibility of the specific NtNode to act on this.
 			break;
 		}
 	}
-	return ret;
+	return rc;
 }
 
 
@@ -137,10 +138,10 @@ NtNodeImu::NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGet
 }
 
 
-bool NtNodeImu::processBusData(uint8_t* recv)
+int8_t NtNodeImu::processBusData(uint8_t* recv)
 {
-	bool ret = NtNode::processBusData(recv);
-	if (busState == GETDATA)
+	int8_t rc = NtNode::processBusData(recv);
+	if (rc == 1 && busState == GETDATA)
 	{
 		if (*recv == NTBUS_CMD_GETSTATUS)
 		{
@@ -151,22 +152,19 @@ bool NtNodeImu::processBusData(uint8_t* recv)
 			UCSR0B |= (1<<TXEN0);    // enable TX line
 			writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
 			UCSR0B &= (1<<TXEN0);    // disable TX line
-            
-            busState = TRIGGERED;
 		}
 		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
 		{
 			UCSR0B |= (1<<TXEN0);    // enable TX line
 			writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
 			UCSR0B &= (1<<TXEN0);    // disable TX line
-            
-            busState = TRIGGERED;
 		}
+		busState = TRIGGERED;
 
 		// don't put busState to TRIGGERED here.
 		// the parent function may have just set it to GETDATA awaiting next character.
 	}
-	return ret;
+	return rc;
 }
 
 void NtNodeImu::writeImuData() const

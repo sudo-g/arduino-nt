@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     ntNodeNameTest();
     ntNodeTriggerPositiveTest();
     ntNodeTriggerNegativeTest();
-    ntNodeToGetdataStatePositiveTest();
     ntNodeToGetdataStateNegativeTest();
     ntNodeToMotordataStatePositiveTest();
     ntNodeUntriggerTest();

@@ -69,23 +69,6 @@ void ntNodeTriggerNegativeTest()
     std::cout << "[PASS]" << std::endl;
 }
 
-void ntNodeToGetdataStatePositiveTest()
-{
-    std::cout << "ntNodeToGetdataStatePositiveTest\t";
-    
-    NtRingBuf buffer = NtRingBuf();
-    NtNode ntNode = NtNode(NTBUS_ID_IMU1, "test", &buffer);
-    
-    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
-    
-    uint8_t recv;
-    while (ntNode.processBusData(&recv));
-    assert(ntNode.getBusState() == NtNode::GETDATA);
-    
-    std::cout << "[PASS]" << std::endl;
-}
-
 void ntNodeToGetdataStateNegativeTest()
 {
     std::cout << "ntNodeToGetdataStateNegativeTest\t";
@@ -97,7 +80,7 @@ void ntNodeToGetdataStateNegativeTest()
     buffer.push(NTBUS_STX);
     
     uint8_t recv;
-    while (ntNode.processBusData(&recv));
+    while (ntNode.processBusData(&recv) >= 0);
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
     
     std::cout << "[PASS]" << std::endl;
@@ -114,7 +97,7 @@ void ntNodeToMotordataStatePositiveTest()
     buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
     
     uint8_t recv;
-    while (ntNode.processBusData(&recv));
+    while (ntNode.processBusData(&recv) >= 0);
     assert(ntNode.getBusState() == NtNode::MOTORDATA);
     
     std::cout << "[PASS]" << std::endl;
@@ -136,7 +119,7 @@ void ntNodeUntriggerTest()
     }
     
     uint8_t recv;
-    while (ntNode.processBusData(&recv));
+    while (ntNode.processBusData(&recv) >= 0);
     assert(ntNode.getBusState() == NtNode::IDLE);
     
     std::cout << "[PASS]" << std::endl;
@@ -154,7 +137,7 @@ void ntNodeGetVersionStrTest()
     buffer.push(NTBUS_CMD_GETVERSIONSTR);
     
     uint8_t recv;
-    while (ntNode.processBusData(&recv));
+    while (ntNode.processBusData(&recv) >= 0);
     assert(ntNode.getBusState() == NtNode::TRIGGERED);
     
     const uint8_t reference[NTBUS_CMDGETVERSIONSTR_DATALEN] = STORM32NTBUS_VERSIONSTR;
