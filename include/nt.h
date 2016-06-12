@@ -189,16 +189,17 @@ public:
 	 * Creates a NtNode which matches a specified ID.
 	 *
 	 * \param id     NT ID which this node responds to.
+	 * \param board  String name of the board.
 	 * \param buffer The ring buffer to read serial from.
 	 */
-	NtNode(uint8_t id, NtRingBuf* buffer);
+	NtNode(uint8_t id, const char* board, NtRingBuf* buffer);
 
 	/**
-	 * Create a NtNode which is linked to module's buffer.
+	 * Writes the board string to buffer.
 	 *
-	 * \param id NT ID which this node response to.
+	 * \param buf Buffer to write the board string to.
 	 */
-	static NtNode createNtNode(uint8_t id);
+	void writeBoardStr(char* buf) const;
 
 	/**
 	 * \return The state of the NT bus.
@@ -217,6 +218,7 @@ protected:
 	NtState busState = IDLE;
 
 private:
+	char boardStr[NTBUS_CMDGETBOARDSTR_DATALEN];
 	NtRingBuf* buffer;
 	uint8_t mtrDatChars = 0;
 };
@@ -233,7 +235,7 @@ public:
 	 * \param imudata   Descriptor of IMU measurements.
 	 * \param model     Model of IMU used.
 	 */
-	NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model);
+	NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model);
 
 	/**
 	 * Handle data written to the bus.

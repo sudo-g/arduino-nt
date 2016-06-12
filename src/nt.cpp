@@ -43,11 +43,13 @@ uint8_t NtRingBuf::getUnreadBytes() const
 static NtRingBuf ntBuffer = NtRingBuf();
 
 
-NtNode::NtNode(uint8_t id, NtRingBuf* buffer) :
+NtNode::NtNode(uint8_t id, const char* board, NtRingBuf* buffer) :
 		matchIdGetData(NTBUS_STX | NTBUS_GET | id),
 		busState(IDLE),
 		buffer(buffer)
 {
+	memcpy(boardStr, board, NTBUS_CMDGETBOARDSTR_DATALEN);
+
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
 	UBRR0H = 0;
@@ -63,10 +65,9 @@ NtNode::NtNode(uint8_t id, NtRingBuf* buffer) :
 	UCSR0B |= (1<<RXCIE0) | (1<<RXEN0);
 }
 
-NtNode NtNode::createNtNode(uint8_t id)
+void NtNode::writeBoardStr(char* buf) const
 {
-	NtNode ntNode = NtNode(id, &ntBuffer);
-	return ntNode;
+	memcpy(buf, boardStr, NTBUS_CMDGETBOARDSTR_DATALEN);
 }
 
 NtNode::NtState NtNode::getBusState() const
@@ -127,8 +128,8 @@ bool NtNode::processBusData(uint8_t* recv)
 }
 
 
-NtNodeImu::NtNodeImu(uint8_t id, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model) :
-		NtNode(id, buffer),
+NtNodeImu::NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model) :
+		NtNode(id, board, buffer),
 		mImudata(imudata),
 		modelCode(model)
 {

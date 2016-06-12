@@ -59,6 +59,8 @@ void ntRingBufPopLoopTest()
 	uint8_t buffer;
 	assert(ringbuf.pop(&buffer));
 	assert(buffer == 1);
+    assert(ringbuf.pop(&buffer));
+    assert(buffer == 1);
     
     std::cout << "[PASS]" << std::endl;
 }

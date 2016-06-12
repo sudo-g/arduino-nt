@@ -12,7 +12,7 @@ void ntNodeImuTriggerPositiveTest()
     tNTBusGetImuData imudata;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, "test", &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
     
@@ -30,7 +30,7 @@ void ntNodeImuTriggerNegativeTest()
     tNTBusGetImuData imudata;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, "test", &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     buffer.push(NTBUS_STX);
     
@@ -45,7 +45,7 @@ void ntNodeImuGetstatusTest()
 {
     std::cout << "ntNodeImuGetstatusTest\t";
     
-    const uint8_t imustat = 0x01;
+    const uint8_t imustat = NTBUS_IMU_IMUSTATUS_BASE | NTBUS_IMU_IMUSTATUS_GYRODATA_OK;
     
     tNTBusGetImuData imudata;
     imudata.AccX = 1;
@@ -58,7 +58,7 @@ void ntNodeImuGetstatusTest()
     imudata.ImuStatus = imustat;
     
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, "test", &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     // go into GETDATA mode.
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
@@ -110,7 +110,7 @@ void ntNodeImuGetconfigurationTest()
     
     const uint16_t imuconfig = NTBUS_IMU_CONFIG_MPU6000;
     NtRingBuf buffer = NtRingBuf();
-    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, "test", &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
     
     // go into GETDATA mode.
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);

@@ -2,6 +2,7 @@
 #define _NTNODETEST_H_
 
 void ntNodeMatchIdTest();
+void ntNodeNameTest();
 void ntNodeTriggerPositiveTest();
 void ntNodeTriggerNegativeTest();
 void ntNodeToGetdataStatePositiveTest();
