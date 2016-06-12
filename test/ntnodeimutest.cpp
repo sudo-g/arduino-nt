@@ -62,12 +62,12 @@ void ntNodeImuGetstatusTest()
     
     // go into GETDATA mode.
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_GET | NTBUS_ID_IMU1);
+    buffer.push(NTBUS_STX | NTBUS_CMD | NTBUS_ID_IMU1);
     
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
     while (ntNodeImu.processBusData(&recv) >= 0);
-    assert(ntNodeImu.getBusState() == NtNode::GETDATA);
+    assert(ntNodeImu.getBusState() == NtNode::COMMANDED);
     
     // request status data.
     buffer.push(NTBUS_CMD_GETSTATUS);
@@ -114,12 +114,12 @@ void ntNodeImuGetconfigurationTest()
     
     // go into GETDATA mode.
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_GET | NTBUS_ID_IMU1);
+    buffer.push(NTBUS_STX | NTBUS_CMD | NTBUS_ID_IMU1);
     
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
     while (ntNodeImu.processBusData(&recv) >= 0);
-    assert(ntNodeImu.getBusState() == NtNode::GETDATA);
+    assert(ntNodeImu.getBusState() == NtNode::COMMANDED);
     
     // request status data.
     buffer.push(NTBUS_CMD_GETCONFIGURATION);

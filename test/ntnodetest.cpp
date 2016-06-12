@@ -135,7 +135,7 @@ void ntNodeGetVersionStrTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, "test", &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
+    buffer.push(NTBUS_STX | NTBUS_CMD | NTBUS_ID_IMU1);
     buffer.push(NTBUS_CMD_GETVERSIONSTR);
     
     uint8_t recv;
@@ -164,7 +164,7 @@ void ntNodeGetBoardStrTest()
     NtNode ntNode = NtNode(NTBUS_ID_IMU1, boardNameBuf, &buffer);
     
     buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
+    buffer.push(NTBUS_STX | NTBUS_CMD | NTBUS_ID_IMU1);
     buffer.push(NTBUS_CMD_GETBOARDSTR);
     
     uint8_t recv;

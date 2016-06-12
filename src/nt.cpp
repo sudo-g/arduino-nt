@@ -47,6 +47,7 @@ static NtRingBuf ntBuffer = NtRingBuf();
 
 NtNode::NtNode(uint8_t id, const char* board, NtRingBuf* buffer) :
 		matchIdGetData(NTBUS_STX | NTBUS_GET | id),
+		matchIdCommand(NTBUS_STX | NTBUS_CMD | id),
 		busState(IDLE),
 		buffer(buffer)
 {
@@ -97,12 +98,19 @@ int8_t NtNode::processBusData(uint8_t* recv)
 			{
 				busState = GETDATA;
 			}
+			else if (*recv == matchIdCommand)
+			{
+				busState = COMMANDED;
+			}
 			else if (*recv == (NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL))
 			{
 				busState = MOTORDATA;
 			}
 			break;
 		case GETDATA:
+			rc = 1;    // only applicable to specific NtNode types.
+			break;
+		case COMMANDED:
 			if (*recv == NTBUS_CMD_GETVERSIONSTR)
 			{
 				tNTBusCmdGetVersionStrData vStrData;
@@ -154,28 +162,33 @@ NtNodeImu::NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGet
 int8_t NtNodeImu::processBusData(uint8_t* recv)
 {
 	int8_t rc = NtNode::processBusData(recv);
-	if (rc == 1 && busState == GETDATA)
+	if (rc == 1)
 	{
-		if (*recv == NTBUS_CMD_GETSTATUS)
+		if (busState == GETDATA)
 		{
-			tNTBusCmdGetStatusData statusData;
-			statusData.Status = NTBUS_IMU_STATUS_IMU_PRESENT;
-			statusData.State = mImudata->ImuStatus;
 
-			WITH_USART0_TX_ENABLED(
-				writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
-			)
 		}
-		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
+		else if (busState == COMMANDED)
 		{
-			WITH_USART0_TX_ENABLED(
-				writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
-			)
-		}
-		busState = TRIGGERED;
+			if (*recv == NTBUS_CMD_GETSTATUS)
+			{
+				tNTBusCmdGetStatusData statusData;
+				statusData.Status = NTBUS_IMU_STATUS_IMU_PRESENT;
+				statusData.State = mImudata->ImuStatus;
 
-		// don't put busState to TRIGGERED here.
-		// the parent function may have just set it to GETDATA awaiting next character.
+				WITH_USART0_TX_ENABLED(
+					writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
+				)
+			}
+			else if (*recv == NTBUS_CMD_GETCONFIGURATION)
+			{
+				WITH_USART0_TX_ENABLED(
+					writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
+				)
+			}
+
+			busState = TRIGGERED;    // keep FSM in sync even if byte is missed.
+		}
 	}
 	return rc;
 }

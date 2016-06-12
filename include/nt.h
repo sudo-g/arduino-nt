@@ -180,10 +180,11 @@ class NtNode
 public:
 	enum NtState
 	{
-		IDLE, TRIGGERED, GETDATA, MOTORDATA
+		IDLE, TRIGGERED, GETDATA, COMMANDED, MOTORDATA
 	};
 
 	const uint8_t matchIdGetData;
+	const uint8_t matchIdCommand;
 
 	/**
 	 * Creates a NtNode which matches a specified ID.
