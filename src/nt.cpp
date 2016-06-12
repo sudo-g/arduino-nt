@@ -107,13 +107,24 @@ int8_t NtNode::processBusData(uint8_t* recv)
 				memset(vStrData.VersionStr, 0, NTBUS_CMDGETVERSIONSTR_DATALEN);
 				strcpy(vStrData.VersionStr, STORM32NTBUS_VERSIONSTR);
 
-				UCSR0B |= (1<<TXEN0);    // enable TX line
-				writeFrame((uint8_t*) vStrData.VersionStr, NTBUS_CMDGETVERSIONSTR_DATALEN);
-				UCSR0B &= (1<<TXEN0);    // disable TX line
+				WITH_USART0_TX_ENABLED(
+					writeFrame((uint8_t*) vStrData.VersionStr, NTBUS_CMDGETVERSIONSTR_DATALEN);
+				)
 
 				busState = TRIGGERED;
 			}
-			rc = 1;    // specific NtNode types may have its own actions.
+			else if (*recv == NTBUS_CMD_GETBOARDSTR)
+			{
+				WITH_USART0_TX_ENABLED(
+					writeFrame((uint8_t*) boardStr, NTBUS_CMDGETBOARDSTR_DATALEN);
+				)
+
+				busState = TRIGGERED;
+			}
+			else
+			{
+				rc = 1;    // execute actions of the specific NtNode type.
+			}
 			break;
 		case MOTORDATA:
 			mtrDatChars++;
@@ -149,15 +160,15 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 			statusData.Status = NTBUS_IMU_STATUS_IMU_PRESENT;
 			statusData.State = mImudata->ImuStatus;
 
-			UCSR0B |= (1<<TXEN0);    // enable TX line
-			writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
-			UCSR0B &= (1<<TXEN0);    // disable TX line
+			WITH_USART0_TX_ENABLED(
+				writeFrame((uint8_t*) &statusData, NTBUS_CMDGETSTATUS_DATALEN);
+			)
 		}
 		else if (*recv == NTBUS_CMD_GETCONFIGURATION)
 		{
-			UCSR0B |= (1<<TXEN0);    // enable TX line
-			writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
-			UCSR0B &= (1<<TXEN0);    // disable TX line
+			WITH_USART0_TX_ENABLED(
+				writeFrame((uint8_t*) &modelCode, NTBUS_CMDGETCONFIGURATION_DATALEN);
+			)
 		}
 		busState = TRIGGERED;
 

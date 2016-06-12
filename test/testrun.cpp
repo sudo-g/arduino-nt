@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     ntNodeToMotordataStatePositiveTest();
     ntNodeUntriggerTest();
     ntNodeGetVersionStrTest();
+    ntNodeGetBoardStrTest();
     ntCrcCalcTest();
     
     std::cout << std::endl << "Executing ntNodeImu suite of tests..." << std::endl;

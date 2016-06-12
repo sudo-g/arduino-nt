@@ -148,6 +148,42 @@ void ntNodeGetVersionStrTest()
     std::cout << "[PASS]" << std::endl;
 }
 
+void ntNodeGetBoardStrTest()
+{
+    std::cout << "ntNodeGetBoardStrTest\t";
+    
+    const char boardName[] = "test board";
+    char boardNameBuf[NTBUS_CMDGETBOARDSTR_DATALEN];
+    memset(boardNameBuf, 0, sizeof(boardNameBuf));
+    memcpy(boardNameBuf, boardName, sizeof(boardName));
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNode ntNode = NtNode(NTBUS_ID_IMU1, boardNameBuf, &buffer);
+    
+    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
+    buffer.push(NTBUS_STX | NTBUS_ID_IMU1 | NTBUS_GET);
+    buffer.push(NTBUS_CMD_GETBOARDSTR);
+    
+    uint8_t recv;
+    while (ntNode.processBusData(&recv) >= 0);
+    assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    
+    tNTBusCmdGetBoardStrData referenceFrame;
+    memset(&referenceFrame, 0, NTBUS_CMDGETBOARDSTR_DATALEN);
+    memcpy(&referenceFrame, boardName, sizeof(boardName));
+    
+    uint8_t reference[NTBUS_CMDGETBOARDSTR_DATALEN+1];
+    memcpy(reference, &referenceFrame, NTBUS_CMDGETBOARDSTR_DATALEN);
+    reference[NTBUS_CMDGETBOARDSTR_DATALEN] =
+        ntcrc((uint8_t*) &referenceFrame, NTBUS_CMDGETBOARDSTR_DATALEN);
+    
+    assert(memcmp(reference, usart0buf, sizeof(reference)) == 0);
+    
+    usart0_reset();
+    
+    std::cout << "[PASS]" << std::endl;
+}
+
 void ntCrcCalcTest()
 {
     std::cout << "ntCrcCalcTest\t";

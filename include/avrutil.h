@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define WITH_USART0_TX_ENABLED(actions) UCSR0B |= (1<<TXEN0); {actions} UCSR0B &= ~(1<<TXEN0);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
