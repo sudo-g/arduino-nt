@@ -143,11 +143,6 @@ typedef struct {
 class NtRingBuf
 {
 public:
-	// following are public for fast interrupt access.
-	uint8_t slots[NTBUS_BUFSIZE];
-	volatile uint8_t wrtInd;
-	volatile uint8_t unread;
-
 	NtRingBuf();
 
 	/**
@@ -159,9 +154,21 @@ public:
 	bool pop(uint8_t* out);
 
 	/**
-	 * Write a byte into the buffer. Convenience for testing.
+	 * Write a byte into the buffer.
+	 *
+	 * \param data Data to write to the buffer.
 	 */
 	void push(uint8_t data);
+
+	/**
+	 * \return the number of unread bytes.
+	 */
+	uint8_t getUnreadBytes() const;
+
+private:
+	uint8_t slots[NTBUS_BUFSIZE];
+	volatile uint8_t wrtInd;
+	volatile uint8_t unread;
 };
 
 

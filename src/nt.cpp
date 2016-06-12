@@ -13,6 +13,9 @@ NtRingBuf::NtRingBuf() : wrtInd(0), unread(0)
 
 bool NtRingBuf::pop(uint8_t* out)
 {
+	// if push() is atomic, 'wrtInd' and 'unread' are incremented together
+	// and 'unread' is ONLY incremented by push()
+	// which makes this thread safe
 	if (unread > 0)
 	{
 		*out = slots[(wrtInd - unread) & BUF_SIZE_MASK];
@@ -25,10 +28,15 @@ bool NtRingBuf::pop(uint8_t* out)
 	}
 }
 
-void NtRingBuf::push(uint8_t in)
+inline void NtRingBuf::push(uint8_t in)
 {
 	slots[wrtInd++ & BUF_SIZE_MASK] = in;
-	unread++;
+    unread = (unread > BUF_SIZE_MASK) ? NTBUS_BUFSIZE : (unread+1);
+}
+
+uint8_t NtRingBuf::getUnreadBytes() const
+{
+	return unread;
 }
 
 // module wide buffer storing incoming serial
@@ -202,8 +210,6 @@ uint8_t ntcrc(uint8_t* frame, uint8_t length)
 
 ISR(USART_RX_vect)
 {
-	// routine is atomic
-	// observed externally, wrtInd and unread are incremented simultaneously
-	ntBuffer.slots[ntBuffer.wrtInd++ & BUF_SIZE_MASK] = UDR0;
-	ntBuffer.unread++;
+	// interrupt routines are atomic so the push is thread safe.
+	ntBuffer.push(UDR0);
 }
