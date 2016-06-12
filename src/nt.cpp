@@ -153,6 +153,9 @@ bool NtNodeImu::processBusData(uint8_t* recv)
             
             busState = TRIGGERED;
 		}
+
+		// don't put busState to TRIGGERED here.
+		// the parent function may have just set it to GETDATA awaiting next character.
 	}
 	return ret;
 }
@@ -176,8 +179,9 @@ void writeFrame(uint8_t* frame, uint8_t len)
 	uint8_t crc = 0;
 	for (uint8_t i=0; i<len; i++)
 	{
-		usart0_write(*(frame++));
+		usart0_write(*frame);
 		crc ^= *frame;
+        frame++;
 	}
 
 	usart0_write(crc);
