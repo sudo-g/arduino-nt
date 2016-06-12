@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     ntNodeImuTriggerNegativeTest();
     ntNodeImuGetstatusTest();
     ntNodeImuGetconfigurationTest();
+    ntNodeImuGetImuTest();
     
     std::cout << std::endl;
     

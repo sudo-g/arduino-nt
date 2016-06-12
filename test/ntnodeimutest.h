@@ -5,5 +5,6 @@ void ntNodeImuTriggerPositiveTest();
 void ntNodeImuTriggerNegativeTest();
 void ntNodeImuGetstatusTest();
 void ntNodeImuGetconfigurationTest();
+void ntNodeImuGetImuTest();
 
 #endif

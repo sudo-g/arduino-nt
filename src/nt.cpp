@@ -97,6 +97,7 @@ int8_t NtNode::processBusData(uint8_t* recv)
 			if (*recv == matchIdGetData)
 			{
 				busState = GETDATA;
+				rc = 1;    // only specific NtNode types handle this.
 			}
 			else if (*recv == matchIdCommand)
 			{
@@ -108,7 +109,7 @@ int8_t NtNode::processBusData(uint8_t* recv)
 			}
 			break;
 		case GETDATA:
-			rc = 1;    // only applicable to specific NtNode types.
+			// GETDATA handled by subclass, this block is never reached.
 			break;
 		case COMMANDED:
 			if (*recv == NTBUS_CMD_GETVERSIONSTR)
@@ -166,7 +167,11 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 	{
 		if (busState == GETDATA)
 		{
+			WITH_USART0_TX_ENABLED(
+				writeFrame((uint8_t*) mImudata, NTBUS_GET);
+			)
 
+			busState = TRIGGERED;    // keep FSM in sync even if byte is missed.
 		}
 		else if (busState == COMMANDED)
 		{
