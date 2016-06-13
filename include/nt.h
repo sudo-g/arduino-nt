@@ -237,6 +237,8 @@ public:
 	 */
 	NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model);
 
+	static NtNodeImu getNodeWithNtBuffer(uint8_t id, const char* board, tNTBusGetImuData* imudata, uint16_t model);
+
 	/**
 	 * Handle data written to the bus.
 	 *
