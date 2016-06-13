@@ -16,9 +16,6 @@ int main(int argc, char *argv[])
     ntNodeNameTest();
     ntNodeTriggerPositiveTest();
     ntNodeTriggerNegativeTest();
-    ntNodeToGetdataStateNegativeTest();
-    ntNodeToMotordataStatePositiveTest();
-    ntNodeUntriggerTest();
     ntNodeGetVersionStrTest();
     ntNodeGetBoardStrTest();
     ntCrcCalcTest();
@@ -26,6 +23,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl << "Executing ntNodeImu suite of tests..." << std::endl;
     ntNodeImuTriggerPositiveTest();
     ntNodeImuTriggerNegativeTest();
+    ntNodeImuEmptyCommand();
     ntNodeImuGetstatusTest();
     ntNodeImuGetconfigurationTest();
     ntNodeImuGetImuTest();
