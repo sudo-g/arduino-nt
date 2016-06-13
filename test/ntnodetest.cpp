@@ -69,64 +69,6 @@ void ntNodeTriggerNegativeTest()
     std::cout << "[PASS]" << std::endl;
 }
 
-void ntNodeToGetdataStateNegativeTest()
-{
-    std::cout << "ntNodeToGetdataStateNegativeTest\t";
-    
-    NtRingBuf buffer = NtRingBuf();
-    NtNode ntNode = NtNode(NTBUS_ID_IMU1, "test", &buffer);
-    
-    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX);
-    
-    uint8_t recv;
-    while (ntNode.processBusData(&recv) >= 0);
-    assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNode.getBusState() == NtNode::TRIGGERED);
-    
-    std::cout << "[PASS]" << std::endl;
-}
-
-void ntNodeToMotordataStatePositiveTest()
-{
-    std::cout << "ntNodeToMotordataStatePositiveTest\t";
-    
-    NtRingBuf buffer = NtRingBuf();
-    NtNode ntNode = NtNode(NTBUS_ID_IMU1, "test", &buffer);
-    
-    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
-    
-    uint8_t recv;
-    while (ntNode.processBusData(&recv) >= 0);
-    assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNode.getBusState() == NtNode::MOTORDATA);
-    
-    std::cout << "[PASS]" << std::endl;
-}
-
-void ntNodeUntriggerTest()
-{
-    std::cout << "ntNodeUntriggerTest\t";
-    
-    NtRingBuf buffer = NtRingBuf();
-    NtNode ntNode = NtNode(NTBUS_ID_IMU1, "test", &buffer);
-    
-    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
-    buffer.push(NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL);
-    
-    for (uint8_t i=0; i<10; i++)
-    {
-        buffer.push(i);
-    }
-    
-    uint8_t recv;
-    while (ntNode.processBusData(&recv) >= 0);
-    assert(ntNode.getBusState() == NtNode::IDLE);
-    
-    std::cout << "[PASS]" << std::endl;
-}
-
 void ntNodeGetVersionStrTest()
 {
     std::cout << "ntNodeGetVersionStrTest\t";
@@ -141,7 +83,7 @@ void ntNodeGetVersionStrTest()
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
     assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    assert(ntNode.getBusState() == NtNode::IDLE);
     
     const uint8_t reference[NTBUS_CMDGETVERSIONSTR_DATALEN] = STORM32NTBUS_VERSIONSTR;
     assert(memcmp(reference, usart0buf, NTBUS_CMDGETVERSIONSTR_DATALEN) == 0);
@@ -170,7 +112,7 @@ void ntNodeGetBoardStrTest()
     uint8_t recv;
     while (ntNode.processBusData(&recv) >= 0);
     assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNode.getBusState() == NtNode::TRIGGERED);
+    assert(ntNode.getBusState() == NtNode::IDLE);
     
     tNTBusCmdGetBoardStrData referenceFrame;
     memset(&referenceFrame, 0, NTBUS_CMDGETBOARDSTR_DATALEN);

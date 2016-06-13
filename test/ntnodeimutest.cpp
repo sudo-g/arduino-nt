@@ -41,6 +41,32 @@ void ntNodeImuTriggerNegativeTest()
     std::cout << "[PASS]" << std::endl;
 }
 
+void ntNodeImuEmptyCommand()
+{
+    std::cout << "ntNodeEmptyCommand\t";
+    
+    tNTBusGetImuData imudata;
+    imudata.AccX = 1;
+    imudata.AccY = 2;
+    imudata.AccZ = 3;
+    imudata.GyroX = 5;
+    imudata.GyroY = 6;
+    imudata.GyroZ = 4;
+    imudata.Temp = 7;
+    imudata.ImuStatus = NTBUS_IMU_IMUSTATUS_BASE | NTBUS_IMU_IMUSTATUS_GYRODATA_OK;
+    
+    NtRingBuf buffer = NtRingBuf();
+    NtNodeImu ntNodeImu = NtNodeImu(NTBUS_ID_IMU1, "test", &buffer, &imudata, NTBUS_IMU_CONFIG_MPU6000);
+    
+    buffer.push(NTBUS_STX | NTBUS_TRIGGER);
+    buffer.push(NTBUS_STX | NTBUS_CMD | NTBUS_ID_IMU1);
+    buffer.push(0xFF);
+    
+    uint8_t recv;
+    while (ntNodeImu.processBusData(&recv) >= 0);
+    assert(ntNodeImu.getBusState() == NtNode::IDLE);
+}
+
 void ntNodeImuGetstatusTest()
 {
     std::cout << "ntNodeImuGetstatusTest\t";
@@ -73,7 +99,7 @@ void ntNodeImuGetstatusTest()
     buffer.push(NTBUS_CMD_GETSTATUS);
     ntNodeImu.processBusData(&recv);
     assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
+    assert(ntNodeImu.getBusState() == NtNode::IDLE);
     
     // build reference data
     tNTBusCmdGetStatusData referenceFrame;
@@ -126,7 +152,7 @@ void ntNodeImuGetconfigurationTest()
     buffer.push(NTBUS_CMD_GETCONFIGURATION);
     ntNodeImu.processBusData(&recv);
     assert(!(UCSR0B & (1<<TXEN0)));
-    assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
+    assert(ntNodeImu.getBusState() == NtNode::IDLE);
     
     // build reference data
     tNTBusCmdGetConfigurationData referenceFrame;
@@ -173,7 +199,7 @@ void ntNodeImuGetImuTest()
     uint8_t recv;
     memset(&recv, 0, sizeof(recv));
     while (ntNodeImu.processBusData(&recv) >= 0);
-    assert(ntNodeImu.getBusState() == NtNode::TRIGGERED);
+    assert(ntNodeImu.getBusState() == NtNode::IDLE);
     
     // this is the only struct that doesn't pack as it has mixed 16 and 8 bits fields
     // hence the checksum byte isn't being checked to allow the test to pass

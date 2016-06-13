@@ -103,10 +103,6 @@ int8_t NtNode::processBusData(uint8_t* recv)
 			{
 				busState = COMMANDED;
 			}
-			else if (*recv == (NTBUS_STX | NTBUS_SET | NTBUS_ID_MOTORALL))
-			{
-				busState = MOTORDATA;
-			}
 			break;
 		case GETDATA:
 			// GETDATA handled by subclass, this block is never reached.
@@ -122,7 +118,7 @@ int8_t NtNode::processBusData(uint8_t* recv)
 					writeFrame((uint8_t*) vStrData.VersionStr, NTBUS_CMDGETVERSIONSTR_DATALEN);
 				)
 
-				busState = TRIGGERED;
+				busState = IDLE;
 			}
 			else if (*recv == NTBUS_CMD_GETBOARDSTR)
 			{
@@ -130,20 +126,12 @@ int8_t NtNode::processBusData(uint8_t* recv)
 					writeFrame((uint8_t*) boardStr, NTBUS_CMDGETBOARDSTR_DATALEN);
 				)
 
-				busState = TRIGGERED;
+				busState = IDLE;
 			}
 			else
 			{
 				rc = 1;    // execute actions of the specific NtNode type.
 			}
-			break;
-		case MOTORDATA:
-			mtrDatChars++;
-			if (mtrDatChars >= 10)
-			{
-				busState = IDLE;
-			}
-			rc = 1;    // is the responsibility of the specific NtNode to act on this.
 			break;
 		}
 	}
@@ -171,7 +159,7 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 				writeFrame((uint8_t*) mImudata, NTBUS_GET);
 			)
 
-			busState = TRIGGERED;    // keep FSM in sync even if byte is missed.
+			busState = IDLE;    // keep FSM in sync even if byte is missed.
 		}
 		else if (busState == COMMANDED)
 		{
@@ -192,7 +180,7 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 				)
 			}
 
-			busState = TRIGGERED;    // keep FSM in sync even if byte is missed.
+			busState = IDLE;    // keep FSM in sync even if byte is missed.
 		}
 	}
 	return rc;

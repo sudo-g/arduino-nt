@@ -180,7 +180,7 @@ class NtNode
 public:
 	enum NtState
 	{
-		IDLE, TRIGGERED, GETDATA, COMMANDED, MOTORDATA
+		IDLE, TRIGGERED, GETDATA, COMMANDED
 	};
 
 	const uint8_t matchIdGetData;
@@ -221,7 +221,6 @@ protected:
 private:
 	char boardStr[NTBUS_CMDGETBOARDSTR_DATALEN];
 	NtRingBuf* buffer;
-	uint8_t mtrDatChars = 0;
 };
 
 
