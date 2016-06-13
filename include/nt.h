@@ -7,7 +7,6 @@
 #define STORM32NTBUS_VERSION             003
 #define STORM32NTBUS_VERSIONSTR          "v0.03"
 
-#define NTBUS_FROM_MASTER                 (1<<7)
 #define NTBUS_BUFSIZE                     16
 
 // NT MODULE ID LIST
@@ -144,20 +143,32 @@ typedef struct {
 class NtRingBuf
 {
 public:
-	// following are public for fast interrupt access.
-	uint8_t slots[NTBUS_BUFSIZE];
-	uint8_t wrtInd;
-	uint8_t unread;
-
 	NtRingBuf();
 
 	/**
 	 * Get the last unread byte from buffer.
 	 *
-	 * \param data Buffer to write output to.
+	 * \param out Buffer to write output to.
 	 * \return True if data was read, False if no unread items.
 	 */
-	bool pop(uint8_t* data);
+	bool pop(uint8_t* out);
+
+	/**
+	 * Write a byte into the buffer.
+	 *
+	 * \param data Data to write to the buffer.
+	 */
+	void push(uint8_t data);
+
+	/**
+	 * \return the number of unread bytes.
+	 */
+	uint8_t getUnreadBytes() const;
+
+private:
+	uint8_t slots[NTBUS_BUFSIZE];
+	volatile uint8_t wrtInd;
+	volatile uint8_t unread;
 };
 
 
@@ -169,25 +180,48 @@ class NtNode
 public:
 	enum NtState
 	{
-		IDLE, TRIGGERED, GETDATA, MOTORDATA
+		IDLE, TRIGGERED, GETDATA, COMMANDED, MOTORDATA
 	};
+
+	const uint8_t matchIdGetData;
+	const uint8_t matchIdCommand;
 
 	/**
 	 * Creates a NtNode which matches a specified ID.
 	 *
-	 * \param id NT ID which this node responds to.
+	 * \param id     NT ID which this node responds to.
+	 * \param board  String name of the board.
+	 * \param buffer The ring buffer to read serial from.
 	 */
-	NtNode(uint8_t id);
+	NtNode(uint8_t id, const char* board, NtRingBuf* buffer);
+
+	/**
+	 * Writes the board string to buffer.
+	 *
+	 * \param buf Buffer to write the board string to.
+	 */
+	void writeBoardStr(char* buf) const;
+
+	/**
+	 * \return The state of the NT bus.
+	 */
+	NtState getBusState() const;
 
 	/**
 	 * Handle data written to the bus.
+	 *
+	 * \param recv Byte received from the serial buffer.
+	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
 	 */
-	void processBusData();
+	int8_t processBusData(uint8_t* data);
 
 protected:
-	uint8_t matchIdGetData;
-	NtState busState;
+	NtState busState = IDLE;
+
+private:
+	char boardStr[NTBUS_CMDGETBOARDSTR_DATALEN];
 	NtRingBuf* buffer;
+	uint8_t mtrDatChars = 0;
 };
 
 
@@ -195,12 +229,37 @@ class NtNodeImu : public NtNode
 {
 public:
 	/**
-	 * Writes IMU state to the NT bus.
+	 * Creates a IMU NtNode which matches a specified ID.
 	 *
-	 * \param data   The measurements from the IMU.
-	 * \param status The status of the IMU.
+	 * \param id        NT ID of this IMU node.
+	 * \param buffer    The ring buffer to read serial from.
+	 * \param imudata   Descriptor of IMU measurements.
+	 * \param model     Model of IMU used.
 	 */
-	void writeImuData(tNTBusGetImuData* data, uint8_t status);
+	NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGetImuData* imudata, uint16_t model);
+
+	/**
+	 * Handle data written to the bus.
+	 *
+	 * \param recv Byte received from the serial buffer.
+	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
+	 */
+	int8_t processBusData(uint8_t* data);
+
+private:
+	const tNTBusGetImuData* mImudata;
+	const uint16_t modelCode;
+
+	void writeImuData() const;
 };
+
+/**
+ * Calculate checksum of a NT frame.
+ *
+ * \param frame  Frame data.
+ * \param length The length of the frame.
+ * \return Checksum value of the frame.
+ */
+uint8_t ntcrc(uint8_t* frame, uint8_t length);
 
 #endif

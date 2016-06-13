@@ -1,53 +1,66 @@
 #include "ntringbuftest.h"
 #include <assert.h>
 #include <string.h>
+#include <iostream>
 #include "nt.h"
 
 void ntRingBufPopFromBeginTest()
 {
+    std::cout << "ntRingBufPopFromBeginTest\t";
+    
 	// initialize ring buffer
 	NtRingBuf ringbuf = NtRingBuf();
-    memset(ringbuf.slots, 0, sizeof(ringbuf.slots));
-	assert(ringbuf.wrtInd == 0);
-	assert(ringbuf.unread == 0);
-
-	const unsigned int ringBufIndexMask = sizeof(ringbuf.slots) - 1;
-
-	// write some data to the ring buffer
-	ringbuf.slots[ringbuf.wrtInd++ & ringBufIndexMask] = 2;
-	ringbuf.unread++;
+	assert(ringbuf.getUnreadBytes() == 0);
+    
+	ringbuf.push(2);
 
 	// test reading from ring buffer
 	uint8_t buffer;
 	assert(ringbuf.pop(&buffer));
 	assert(buffer == 2);
-	assert(ringbuf.unread == 0);
+	assert(ringbuf.getUnreadBytes() == 0);
+    
+    std::cout << "[PASS]" << std::endl;
 }
 
 void ntRingBufPopWhenEmptyTest()
 {
+    std::cout << "ntRingBufPopWhenEmptyTest\t";
+    
 	// initialize ring buffer
 	NtRingBuf ringbuf = NtRingBuf();
-	ringbuf.wrtInd = 3;
+    
+    ringbuf.push(1);
+    ringbuf.push(2);
+    
+    uint8_t recv;
+    ringbuf.pop(&recv);
+    ringbuf.pop(&recv);
 
 	uint8_t buffer;
 	assert(!ringbuf.pop(&buffer));
-	assert(ringbuf.unread == 0);
-	assert(ringbuf.wrtInd == 3);
+	assert(ringbuf.getUnreadBytes() == 0);
+    
+    std::cout << "[PASS]" << std::endl;
 }
 
 void ntRingBufPopLoopTest()
 {
+    std::cout << "ntRingBufPopLoopTest\t";
+    
 	NtRingBuf ringbuf = NtRingBuf();
-    memset(ringbuf.slots, 0, sizeof(ringbuf.slots));
     
-    const unsigned int ringBufIndexMask = sizeof(ringbuf.slots) - 1;
-    
-	ringbuf.wrtInd = NTBUS_BUFSIZE - 1;
-	ringbuf.slots[ringbuf.wrtInd++ & ringBufIndexMask] = 1;
-    ringbuf.unread++;
+    for (unsigned int i=0; i<NTBUS_BUFSIZE; i++)
+    {
+        ringbuf.push(1);
+    }
+    ringbuf.push(3);
 
 	uint8_t buffer;
 	assert(ringbuf.pop(&buffer));
 	assert(buffer == 1);
+    assert(ringbuf.pop(&buffer));
+    assert(buffer == 1);
+    
+    std::cout << "[PASS]" << std::endl;
 }
