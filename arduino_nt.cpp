@@ -6,8 +6,8 @@
 int main(void)
 {
 	tNTBusGetImuData imuData;
-	imuData.ImuStatus = NTBUS_IMU_IMUSTATUS_BASE | NTBUS_IMU_IMUSTATUS_GYRODATA_OK | NTBUS_IMU_IMUSTATUS_ACCDATA_OK;
 	memset(&imuData, 0, sizeof(imuData));
+	imuData.ImuStatus = NTBUS_IMU_IMUSTATUS_BASE | NTBUS_IMU_IMUSTATUS_GYRODATA_OK | NTBUS_IMU_IMUSTATUS_ACCDATA_OK;
 
 	Wire.begin();
 
