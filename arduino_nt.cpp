@@ -1,5 +1,3 @@
-#include "arduino_nt.h"
-
 #include <string.h>
 #include <Wire.h>
 #include "MPU6050.h"
