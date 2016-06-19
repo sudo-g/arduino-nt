@@ -147,6 +147,11 @@ NtNodeImu::NtNodeImu(uint8_t id, const char* board, NtRingBuf* buffer, tNTBusGet
 
 }
 
+NtNodeImu NtNodeImu::getNodeWithNtBuffer(uint8_t id, const char* board, tNTBusGetImuData* imudata, uint16_t model)
+{
+	NtNodeImu ntNodeImu = NtNodeImu(id, board, &ntBuffer, imudata, model);
+	return ntNodeImu;
+}
 
 int8_t NtNodeImu::processBusData(uint8_t* recv)
 {
