@@ -4,7 +4,6 @@
 #include "nt.h"
 
 #define NT_TASK_RATE 95
-#define TWI_FREQ 400000L
 
 int main(void)
 {
