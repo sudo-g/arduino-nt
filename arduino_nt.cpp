@@ -9,6 +9,8 @@ int main(void)
 	memset(&imuData, 0, sizeof(imuData));
 	imuData.ImuStatus = NTBUS_IMU_IMUSTATUS_BASE | NTBUS_IMU_IMUSTATUS_GYRODATA_OK | NTBUS_IMU_IMUSTATUS_ACCDATA_OK;
 
+	sei();
+
 	Wire.begin();
 
 	MPU6050 imu = MPU6050();
@@ -28,8 +30,6 @@ int main(void)
 		uint8_t recv;
 		ntNode.processBusData(&recv);
 	}
-
-	sei();
 
 	return 0;
 }
