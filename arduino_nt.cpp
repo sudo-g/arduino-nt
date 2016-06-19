@@ -3,7 +3,7 @@
 #include "MPU6050.h"
 #include "nt.h"
 
-#define NT_TASK_RATE 58
+#define NT_TASK_RATE 95
 #define TWI_FREQ 400000L
 
 int main(void)
