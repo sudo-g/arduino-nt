@@ -3,6 +3,8 @@
 #include "MPU6050.h"
 #include "nt.h"
 
+#define NT_TASK_RATE 95
+
 int main(void)
 {
 	tNTBusGetImuData imuData;
@@ -23,12 +25,21 @@ int main(void)
 
 	NtNodeImu ntNode = NtNodeImu::getNodeWithNtBuffer(NTBUS_ID_IMU1, "ArduNT IMU", &imuData, NTBUS_IMU_CONFIG_MPU6000);
 
+	uint8_t dataProcessCount = 0;
 	for (;;)
 	{
-		imu.getMotion6(&imuData.AccX, &imuData.AccY, &imuData.AccZ, &imuData.GyroX, &imuData.GyroY, &imuData.GyroZ);
-		imuData.Temp = imu.getTemperature();
+		if (dataProcessCount >= NT_TASK_RATE)
+		{
+			// lower priority and thus occurs less frequent than NT tasks
+			imu.getMotion6WithTemp(&imuData.AccX, &imuData.AccY, &imuData.AccZ, &imuData.Temp, &imuData.GyroX, &imuData.GyroY, &imuData.GyroZ);
+
+			dataProcessCount = 0;
+		}
+
 		uint8_t recv;
 		ntNode.processBusData(&recv);
+
+		dataProcessCount++;
 	}
 
 	return 0;
