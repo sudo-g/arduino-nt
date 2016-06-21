@@ -56,7 +56,7 @@ NtNode::NtNode(uint8_t id, const char* board, NtRingBuf* buffer) :
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
 	UBRR0H = 0;
-	UBRR0L = 1;
+	UBRR0L = 0;
 
 	// ignore bytes with leftmost bit == 1
 	// TODO
