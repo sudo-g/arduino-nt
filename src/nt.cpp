@@ -56,7 +56,7 @@ NtNode::NtNode(uint8_t id, const char* board, NtRingBuf* buffer) :
 	// setting UART to 2MBaud
 	UCSR0A |= (1 << U2X0);
 	UBRR0H = 0;
-	UBRR0L = 1;
+	UBRR0L = 0;
 
 	// ignore bytes with leftmost bit == 1
 	// TODO
@@ -161,10 +161,10 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 		if (busState == GETDATA)
 		{
 			WITH_USART0_TX_ENABLED(
-				writeFrame((uint8_t*) mImudata, NTBUS_GET);
+				writeFrame((uint8_t*) mImudata, NTBUS_GETIMU_DATALEN);
 			)
 
-			busState = IDLE;    // keep FSM in sync even if byte is missed.
+			busState = IDLE;    // needs to be re-triggered for more data
 		}
 		else if (busState == COMMANDED)
 		{

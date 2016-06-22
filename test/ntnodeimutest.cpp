@@ -201,14 +201,12 @@ void ntNodeImuGetImuTest()
     while (ntNodeImu.processBusData(&recv) >= 0);
     assert(ntNodeImu.getBusState() == NtNode::IDLE);
     
-    // this is the only struct that doesn't pack as it has mixed 16 and 8 bits fields
-    // hence the checksum byte isn't being checked to allow the test to pass
     uint8_t referenceOut[NTBUS_GETIMU_DATALEN+1];
     memcpy(&referenceOut, &imudata, NTBUS_GETIMU_DATALEN);
     referenceOut[NTBUS_GETIMU_DATALEN] = ntcrc((uint8_t*) &imudata, NTBUS_GETIMU_DATALEN);
     
     // check USART buffer values match reference
-    assert(memcmp(&referenceOut, usart0buf, NTBUS_GETIMU_DATALEN) == 0);
+    assert(memcmp(&referenceOut, usart0buf, sizeof(referenceOut)) == 0);
     
     usart0_reset();
     
