@@ -161,10 +161,10 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 		if (busState == GETDATA)
 		{
 			WITH_USART0_TX_ENABLED(
-				writeFrame((uint8_t*) mImudata, NTBUS_GET);
+				writeFrame((uint8_t*) mImudata, NTBUS_GETIMU_DATALEN);
 			)
 
-			busState = IDLE;    // keep FSM in sync even if byte is missed.
+			busState = IDLE;    // needs to be re-triggered for more data
 		}
 		else if (busState == COMMANDED)
 		{

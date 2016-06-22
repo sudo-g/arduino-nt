@@ -208,7 +208,7 @@ void ntNodeImuGetImuTest()
     referenceOut[NTBUS_GETIMU_DATALEN] = ntcrc((uint8_t*) &imudata, NTBUS_GETIMU_DATALEN);
     
     // check USART buffer values match reference
-    assert(memcmp(&referenceOut, usart0buf, NTBUS_GETIMU_DATALEN) == 0);
+    assert(memcmp(&referenceOut, usart0buf, sizeof(referenceOut)) == 0);
     
     usart0_reset();
     
