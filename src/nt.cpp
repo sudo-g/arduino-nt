@@ -119,6 +119,7 @@ int8_t NtNode::processBusData(uint8_t* recv)
 				)
 
 				busState = IDLE;
+				rc = 2;
 			}
 			else if (*recv == NTBUS_CMD_GETBOARDSTR)
 			{
@@ -127,6 +128,7 @@ int8_t NtNode::processBusData(uint8_t* recv)
 				)
 
 				busState = IDLE;
+				rc = 2;
 			}
 			else
 			{
@@ -186,6 +188,7 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 			}
 
 			busState = IDLE;    // keep FSM in sync even if byte is missed.
+			rc = 2;
 		}
 	}
 	return rc;
