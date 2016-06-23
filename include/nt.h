@@ -211,7 +211,7 @@ public:
 	 * Handle data written to the bus.
 	 *
 	 * \param recv Byte received from the serial buffer.
-	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
+	 * \return 0 if data read, 1 if pass control to sub-class, 2 if data transmitted, -1 if no data read.
 	 */
 	int8_t processBusData(uint8_t* data);
 
@@ -243,7 +243,7 @@ public:
 	 * Handle data written to the bus.
 	 *
 	 * \param recv Byte received from the serial buffer.
-	 * \return 0 if data read, 1 if pass control to sub-class, -1 if no data read.
+	 * \return 0 if data read, 1 if pass control to sub-class, 2 if data transmitted, -1 if no data read.
 	 */
 	int8_t processBusData(uint8_t* data);
 

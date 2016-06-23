@@ -167,6 +167,7 @@ int8_t NtNodeImu::processBusData(uint8_t* recv)
 			)
 
 			busState = IDLE;    // needs to be re-triggered for more data
+			rc = 2;
 		}
 		else if (busState == COMMANDED)
 		{
